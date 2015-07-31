@@ -1,0 +1,73 @@
+Description: document the bootwait, nobootwait, showthrough and optional mount options accepted by mountall. Don't pass these to mount().
+Author: Scott James Remnant <scott@ubuntu.com>
+Date: Wed, 23 Dec 2009 04:29:48
+Bug-Ubuntu: https://launchpad.net/bugs/479965
+
+Index: util-linux-2.25/sys-utils/fstab.5
+===================================================================
+--- util-linux-2.25.orig/sys-utils/fstab.5
++++ util-linux-2.25/sys-utils/fstab.5
+@@ -63,7 +63,9 @@ and
+ .BR umount (8)
+ sequentially iterate through
+ .B fstab
+-doing their thing.
++doing their thing, though at boot time
++.BR mountall (8)
++may process the file out-of-order when it believes it is safe to do so.
+ 
+ .B The first field
+ .RI ( fs_spec ).
+@@ -210,6 +212,27 @@ for use by fstab-maintaining programs
+ do not report errors for this device if it does not exist.
+ .RE
+ 
++The
++.BR mountall (8)
++program that mounts filesystem during boot also recognises additional
++options that the ordinary
++.BR mount (8)
++tool does not.  These are: ``bootwait'' which can be applied to remote
++filesystems mounted outside of
++.I /usr
++or
++.IR /var ,
++without which
++.BR mountall (8)
++would not hold up the boot for these; ``nobootwait'' which can be
++applied to non-remote filesystems to explicitly instruct
++.BR mountall (8)
++not to hold up the boot for them; ``optional'' which causes the entry
++to be ignored if the filesystem type is not known at boot time; and
++``showthrough'' which permits a mountpoint to be mounted before its
++parent mountpoint (this latter should be used carefully, as it can
++cause boot hangs).
++
+ .B The fifth field
+ .RI ( fs_freq ).
+ .RS
+@@ -258,6 +281,7 @@ libmount based mount utility (since util
+ .SH "SEE ALSO"
+ .BR findmnt (8),
+ .BR mount (8),
++.BR mountall (8),
+ .BR swapon (8),
+ .BR fs (5),
+ .BR getmntent (3)
+Index: util-linux-2.25/libmount/src/optmap.c
+===================================================================
+--- util-linux-2.25.orig/libmount/src/optmap.c
++++ util-linux-2.25/libmount/src/optmap.c
+@@ -168,6 +168,12 @@ static const struct libmnt_optmap usersp
+ 
+    { "helper=", MNT_MS_HELPER },			   /* /sbin/mount.<helper> */
+ 
++   /* mountall options */
++   { "bootwait", MNT_MS_COMMENT, MNT_NOHLPS | MNT_NOMTAB },
++   { "nobootwait", MNT_MS_COMMENT, MNT_NOHLPS | MNT_NOMTAB },
++   { "optional", MNT_MS_COMMENT, MNT_NOHLPS | MNT_NOMTAB },
++   { "showthrough", MNT_MS_COMMENT, MNT_NOHLPS | MNT_NOMTAB },
++
+    { NULL, 0, 0 }
+ };
+ 
