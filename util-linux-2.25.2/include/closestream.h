@@ -49,6 +49,7 @@ close_stdout(void)
 		_exit(EXIT_FAILURE);
 }
 
+#define HAVE_FSYNC
 #ifndef HAVE_FSYNC
 static inline int
 fsync(int fd __attribute__((__unused__)))

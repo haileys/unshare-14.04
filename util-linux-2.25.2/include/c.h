@@ -259,6 +259,7 @@ static inline size_t get_hostname_max(void)
 
 static inline int xusleep(useconds_t usec)
 {
+#define HAVE_NANOSLEEP
 #ifdef HAVE_NANOSLEEP
 	struct timespec waittime = {
 		.tv_sec   =  usec / 1000000L,
@@ -283,6 +284,7 @@ static inline int xusleep(useconds_t usec)
 #define USAGE_VERSION    _(" -V, --version  output version information and exit\n")
 #define USAGE_MAN_TAIL(_man)   _("\nFor more details see %s.\n"), _man
 
+#define PACKAGE_STRING "util-linux"
 #define UTIL_LINUX_VERSION _("%s from %s\n"), program_invocation_short_name, PACKAGE_STRING
 
 /*
